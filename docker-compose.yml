@@ -1,0 +1,25 @@
+services:
+  qutip-lab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: qutipd:latest
+    ports:
+      - "8888:8888"
+    user: root
+    environment:
+      - NB_USER=researcher  # Explicitly tell the script who the user is
+      - NB_UID=${MY_UID:-1000}
+      - NB_GID=${MY_GID:-1000}
+      - CHOWN_HOME=yes
+      - CHOWN_HOME_OPTS=-R
+    volumes:
+      - .:/home/researcher  # Mount local dir directly to the home dir
+    working_dir: /home/researcher # Start exactly where we mounted
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
